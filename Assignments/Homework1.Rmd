@@ -1,0 +1,307 @@
+---
+title: "Homework1"
+author: "Yufei Yin"
+output: pdf_document
+---
+
+# 7. 
+In a study of insect physiology, eggs from a beneficial species of moth were put in boxes placed in chambers at different temperatures. There were 30 eggs placed into each box, and the number of eggs hatching after 30 days were counted. The first box at $10^\circ$C had 0 hatch, the first box at $15^\circ$C had 1 hatch, and the first box at $20^\circ$C had
+25 hatch. The data is courtesy of Jim Nechols, Department of Entomology, Kansas State University.
+
+# (a) 
+Construct appropriate confidence intervals for the probability that an egg hatches at each temperature.
+
+\bigskip
+
+\subsection{Temperature $10^\circ$C}
+
+```{r}
+w <- 0
+n <- 30
+alpha <- 0.05
+pi.hat <- w/n
+```
+
+## Wald-type CI
+
+$$ \hat{\pi} \pm Z_{1-\alpha/2} \sqrt{\dfrac{\hat{\pi}(1-\hat{\pi})}{n}}$$
+```{r}
+var.wald <- pi.hat*(1-pi.hat)/n
+round(pi.hat + qnorm(p = c(alpha/2, 1-alpha/2)) * sqrt(var.wald),4)
+```
+
+\bigskip
+
+An adjusted estimate of $\pi$.
+
+$$ \tilde{\pi} = \dfrac{w+Z_{1-\alpha/2}^2/2}{n+Z_{1-\alpha/2}^2}$$
+
+## Score-type CI or Wilson CI
+
+$$ \tilde{\pi} \pm \dfrac{Z_{1-\alpha/2}\sqrt{n}}{n+Z_{1-\alpha/2}^2} \sqrt{\hat{\pi}(1-\hat{\pi})+\dfrac{Z_{1-\alpha/2}^2}{4n}}$$
+
+```{r}
+p.tilde <- (w + qnorm(p = 1-alpha/2)^2 /2) / (n + qnorm(p = 1-alpha/2)^2)
+round(p.tilde + qnorm(p = c(alpha/2, 1-alpha/2)) * sqrt(n) / (n+qnorm(p = 1-alpha/2)^2) * 
+        sqrt(pi.hat*(1-pi.hat) + qnorm(p = 1-alpha/2)^2/(4*n)),4)
+```
+
+## Agresti-Coull CI
+
+$$ \tilde{\pi} \pm Z_{1-\alpha/2} \sqrt{\dfrac{\tilde{\pi}(1-\tilde{\pi})}{n+Z_{1-\alpha/2}^2}}$$
+
+```{r}
+var.ac <- p.tilde*(1-p.tilde) / (n+qnorm(p = 1-alpha/2)^2)
+round(p.tilde + qnorm(p = c(alpha/2, 1-alpha/2)) * sqrt(var.ac),4)
+```
+
+## Exact CI or Clopper-Pearson CI
+
+The (1-$\alpha$)100% Clopper-Pearson interval is simply quantiles from two beta distribution:
+$$ beta(\alpha/2;\space w,\space n-w+1) < \pi < beta(1-\alpha/2;\space w+1,\space n-w)$$
+
+```{r}
+round(qbeta(p = c(alpha/2, 1-alpha/2), shape1 = c(w, w+1), shape2 = c(n-w+1, n-w)),4)
+```
+
+For temperature $10^\circ$C, since w = 0, our Wald-type CI is (0,0).
+
+Our Agresti-Coull CI is (-0.0212,0.1347), the lower limit is lower than 0.
+
+So Wilson CI and Clopper-Pearson CI seems more appropriate for this question.
+
+\bigskip
+
+We could also use \emph{binom.confint()} function from binom package to calculate confidence interval.
+
+```{r}
+library(binom)
+binom.confint(x = w, n = n, conf.level = 1-alpha, 
+              methods = c("asymptotic","wilson","agresti-coull","exact"))
+```
+similarly
+
+\subsection{Temperature $15^\circ$C}
+
+```{r}
+w <- 1
+binom.confint(x = w, n = n, conf.level = 1-alpha, 
+              methods = c("asymptotic","wilson","agresti-coull","exact"))
+```
+
+\subsection{Temperature $20^\circ$C}
+
+```{r}
+w <- 25
+binom.confint(x = w, n = n, conf.level = 1-alpha, 
+              methods = c("asymptotic","wilson","agresti-coull","exact"))
+```
+
+In conclusion, Our sample size n = 30 which is small, so Wald CI and Agresti-Coull CI are not appropriate for this question. Moreover, at temperature $15^\circ$C, the lower limit of Wilson CI and Exact CI are quite different. This is due to our extreme $\pi$ value. When we have extreme $\pi$ value, the Wilson CI could be liberal. 
+
+So in this question, if we have an extreme $\pi$ value, Exact CI might be the best, if we do not have an extreme $\pi$ value, both Wilson CI and Exact CI are appropriate CIs.
+
+
+
+\newpage
+
+# (b) 
+Assess informally whether the probabilities could be the same at each temperature. Explain your reasoning. Note that we will develop more formal ways of making these comparisons in Chapter 2.
+
+\bigskip
+
+Informally, i think the probabilities could not be the same at each temperature, because confidence interval should contain the true probability, and the lower limit confidence interval at temperature $20^\circ$C is great than the upper limit confidence interval at temperature $15^\circ$C and $10^\circ$C. We may informally assume that the probability of hatching at temperature $20^\circ$C is higher.
+
+\newpage
+
+# 8. 
+Continuing Exercise 7, the researchers actually used 10 different boxes of 30 eggs at each temperature. The counts of hatched eggs for the 10 boxes at $15^\circ$C were 1, 2, 4, 1, 0, 0, 0, 12, 0, and 2.
+
+# (a) 
+Why do you suppose that the researchers used more than one box at each temperature?
+
+\bigskip
+
+Different boxes may affect the probability of hatching. By using more than one box at each temperature, the researchers are able to test that if different boxes change the probability of hatching.
+
+\newpage
+
+# (b) 
+Construct appropriate confidence intervals for the probability that an egg hatches in each box.
+
+\bigskip
+
+Similar to Question 7, we have some extreme $\pi$ values, so Exact CI is the most appropriate CI for this question.
+
+```{r}
+w = c(1, 2, 4, 1, 0, 0, 0, 12, 0, 2)
+binom.confint(x = w, n = n, conf.level = 1-alpha, methods = c("wilson","exact"))
+
+```
+
+When we have extreme $\pi$ value, for example, x = 1,2 or even 4, the Wilson CI and Exact CI are quite different; however when x = 12, the Wilson CI and Exact CI both are appropriate CIs.
+
+\newpage
+
+# (c) 
+Based on the intervals, does it appear that the probability that an egg hatches is the same in all boxes? Explain your reasoning.
+
+\bigskip
+
+Based on the intervals, the probability that an egg hatches is not the same in all boxes. Especially for the 8th box, there are 12 hatched eggs which is really different than other boxes.
+
+\newpage
+
+# (d) 
+All 10 boxes were held in the same chamber at the same time, and the chamber was set to $15^\circ$C. How do you suppose it could happen that they give such different counts? Hint: See part (c).
+
+\bigskip
+
+We can not make sure all boxes are in the same condition even though they were held in the same chamber. For example, we can not promise that the temperature is exactly the same in the chamber.
+
+\newpage
+
+# (e) 
+Do you think that it would be appropriate to consider the data as w = 22 successes coming from a binomial distribution with n = 300 trials? Why or why not?
+
+\bigskip
+
+We can combine all the boxes using a binomial distribution as long as the process of observing repeated trials satisfies certain assumptions. Those assumptions are:
+
+1. There are n identical trials.
+
+2. There are two possible outcome for each trial.
+
+3. The trials are independent of each other.
+
+4. The probability of success remains constant for each trial.
+
+5. The random variable of interest w is the number of success.
+
+\newpage
+
+# 13. 
+There are many other proposed confidence intervals for $\pi$. One of these intervals mentioned in Section 1.1.2 was the LR interval. Using this interval, complete the following:
+
+# (a) 
+Verify the 95% LR confidence interval is 0:1456 < $\pi$ < 0:7000 when n = 10 and w = 4. Note that binom.confint() calculates this interval using the methods = "lrt" argument value. We also provide additional code to calculate the interval in CIpi.R.
+
+\bigskip
+
+```{r}
+w <- 4
+n <- 10
+alpha <- 0.05
+binom.confint(x = w, n = n, conf.level = 1-alpha, methods = "lrt")
+```
+```{r}
+# Set -2log(Lambda) - chi^2_1,1-alpha equal to 0 and solve for root 
+#to find lower and upper bounds for interval
+LRT2 <- function(pi.0, w, n, alpha) {
+  pi.hat <- w/n
+  -2*(w*log(pi.0/pi.hat) + (n-w)*log((1-pi.0)/(1-pi.hat))) - qchisq(p = 1-alpha, df = 1)
+}
+  
+# Confidence interval, differences between here and binom.confint() are very small
+uniroot(f = LRT2, lower = 0, upper = w/n, w = w, n = n, alpha = alpha)[1]  # Lower bound
+uniroot(f = LRT2, lower = w/n, upper = 1, w = w, n = n, alpha = alpha)[1]  # Upper bound
+```
+
+\newpage
+
+# (b) 
+Construct a plot of the true confidence levels similar to those in Figure 1.3. Use n = 40 and $\pi$ = 0.05, and vary $\pi$ from 0.001 to 0.999 by 0.0005.
+
+\bigskip
+
+
+```{r}
+# Initial settings 
+alpha <- 0.05
+n <- 40
+w <- 0:n
+
+# LR
+lower.LR <- binom.lrt(x = w, n = n, conf.level = 0.95)[5]
+upper.LR <- binom.lrt(x = w, n = n, conf.level = 0.95)[6]
+
+# All pi's
+pi.seq <- seq(from = 0.001, to = 0.999, by = 0.0005)
+
+# Save true confidence levels in a matrix
+save.true.conf <- matrix(data = NA, nrow = length(pi.seq), ncol = 2)
+
+# Create counter for the loop
+counter <- 1
+
+# Loop over each pi that the true confidence level is calculated on
+for(pi in pi.seq) {
+
+  pmf <- dbinom(x = w, size = n, prob = pi)
+  
+  # LR
+  save.LR <- ifelse(test = pi>lower.LR, yes = ifelse(test = pi<upper.LR, yes = 1, no = 0), no = 0)
+  LR <- sum(save.LR*pmf)
+  
+  save.true.conf[counter,] <- c(pi,LR)
+  counter <- counter+1
+}
+
+# Plots
+plot(x = save.true.conf[,1], y = save.true.conf[,2], main = "LR", xlab = expression(pi),
+     ylab = "True confidence level", type = "l", ylim = c(0.85,1))
+abline(h = 1-alpha, lty = "dotted")
+```
+
+```{r,echo=FALSE}
+library(lattice)
+```
+
+```{r, fig.width=7, fig.height=4 }
+binom.plot(n = 40, method = binom.lrt, np = 500, conf.level = 0.95)
+```
+
+\newpage
+
+# (c) 
+Compare the LR interval’s true confidence level to those of the four other intervals discussed in Section 1.1.2. Which of these intervals is best? Explain.
+
+![Ture Confidence Level](D:/Simon Fraser University/2021 spring/STAT 475/HW/hw1/True CI.png)
+
+\bigskip
+
+For 0 < $\pi$ < 0.05, 0.95 < $\pi$ < 1, The LR interval is conservative.
+
+For 0.05 < $\pi$ < 0.1, 0.9 < $\pi$ < 0.95, The LR interval is liberal.
+
+For 0.1 < $\pi$ < 0.9, The LR true confidence level generally between 0.92 and 0.97 which considered as good performance.
+
+Overall, 
+
+- The Wald interval tends to be the farthest from 0.95 the most often. In fact, the true confidence level is often too low for it to be on the plot at extreme values of $\pi$.
+
+- The Agresti-Coull interval does a much better job than the Wald with its true confidence level usually between 0.93 and 0.98. For values of $\pi$ close to 0 or 1, the interval can be very conservative.
+
+- The Wilson interval performs a little better than the Agresti-Coull interval with its true confidence level generally between 0.93 and 0.97; however, for very extreme $\pi$, it can be very liberal.
+
+- The Clopper-Pearson interval has a true confidence level at or above the stated level, where it is generally oscillating between 0.95 and 0.98. For values of $\pi$ close to 0 or 1, the interval can be very conservative.
+
+- The LR interval is similar to Wilson interval, but Wilson interval has better performance on (0.05,0.1) and (0.9,0.95) than LR interval, so Wilson interval is still the best.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

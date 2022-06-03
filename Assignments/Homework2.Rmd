@@ -1,0 +1,602 @@
+---
+title: "Homework2"
+author: "Yufei Yin"
+output: pdf_document
+---
+
+# 19.
+
+On September 24, 2009, news reports hailed the findings from an HIV vaccine clinical trial as being the first time that a vaccine worked. These news reports often made front-page headlines in newspapers and lead stories on television newscasts (examples are available on the textbook’s website). The vaccine actually was a combination of two previous tested vaccines, ALVAC-HIV and AIDSVAX B/E, that were not shown to prevent HIV infection in previous clinical trials by themselves. The purpose of this problem is for you to analyze the research data in order to draw your own conclusions. Table 1.9 summarizes the “modified intent-to-treat” data of Rerks-Ngarm et al. (2009) that was released to the media on September 24. Using the modified intent-to-treat data, complete the following:
+
+```{r}
+table1.9 <- array(data = c(51,74,125,8146,8124,16270,8197,8198,16395), 
+                 dim = c(3,3), 
+                 dimnames = list(Treatment = c("Vaccine", "Placebo", "Total"),
+                                 Response = c("HIV", "No HIV", "Total")))
+table1.9
+```
+
+# (a)
+
+If you have access to Rerks-Ngarm et al. (2009), describe the population and sample used in the study. What is the population ultimately that the researchers would like to extend their conclusions to?
+
+\bigskip
+
+According to the article provided in canvas, the sample used in the study is 16,395 healthy men and women between the ages of 18 and 30 years in Rayong and Chon Buri provinces in Thailand, and the population is all the healthy people between the ages of 18 and 30 years in Rayong and Chon Buri provinces in Thailand. Finally the population ultimately that the researchers would like to extend their conclusions to is the whole world.
+
+\newpage
+
+# (b)
+
+Examine the benefits of using the vaccine over the placebo with the most appropriate measure(s) from Section 1.2. Use $\alpha$ = 0.05.
+
+\bigskip
+
+## Hypothesis Test
+
+```{r}
+c.table1.9 <- array(data = c(51,74,8146,8124),
+                 dim = c(2,2),
+                 dimnames = list(Treatment = c("Vaccine", "Placebo"),
+                                 Response = c("HIV", "No HIV")))
+c.table1.9
+```
+
+```{r,warning=FALSE, message=FALSE}
+library(vcd)
+```
+
+```{r}
+assocstats(x = c.table1.9)
+```
+
+\bigskip
+
+Hypothesis Test:
+
+$$H_0:\pi_1-\pi_2=0 \;\;\;\; vs \;\;\; H_a: \pi_1-\pi_2 \neq 0 $$
+
+According to the result of Likelihood Ratio test and Pearson chi-square test, p-value is less than 0.05, so we reject the null hypothesis. We could conclude that the probability of contracting HIV is different between Vaccine and Placebo group.
+
+\bigskip
+
+```{r}
+# Initialize
+w1 <- 51
+w2 <- 74
+n1 <- 8197
+n2 <- 8198
+pi.hat1 <- w1/n1
+pi.hat2 <- w2/n2
+alpha <- 0.05
+```
+
+
+## Relative Risk
+
+```{r}
+round(pi.hat1/pi.hat2, 4)
+```
+
+## Relative Risk CI
+
+```{r}
+var.log.rr<-(1-pi.hat1)/(n1*pi.hat1) + (1-pi.hat2)/(n2*pi.hat2)
+ci<-exp(log(pi.hat1/pi.hat2) + qnorm(p = c(alpha/2, 1-alpha/2)) * sqrt(var.log.rr))
+round(ci, 4)
+```
+
+We found the estimated relative risk is 0.6893. The estimated probability of contracting HIV is 68.93% as large for the vaccine group than for placebo. Moreover, The confidence interval is 0.4831 < RR < 0.9834, because 1 is not within the interval, there is sufficient evidence to indicate the vaccine does decrease the the probability of contracting HIV.
+
+## Odds Ratio
+
+```{r}
+Odds1 <- pi.hat1/(1-pi.hat1)
+Odds2 <- pi.hat2/(1-pi.hat2)
+OR.hat <- Odds1/Odds2
+round(OR.hat, 4)
+```
+
+## Odds Ratio CI
+
+```{r}
+var.log.or<-1/w1 + 1/(n1-w1) + 1/w2 + 1/(n2-w2)
+OR.CI<-exp(log(OR.hat) + qnorm(p = c(alpha/2, 1-alpha/2)) * sqrt(var.log.or))
+round(OR.CI, 4)
+```
+
+We found the estimated relative risk is 0.6873. The estimated odds of contracting HIV are 0.6873 times as large as in Vaccine group than in placebo group. Moreover, The confidence interval is 0.4805 < OR < 0.9832, Because 1 is not within the interval, there is sufficient evidence to indicate the vaccine does decrease the true odds (and hence the probability) of contracting HIV.
+
+\newpage
+
+# (c) 
+Suppose you were a reporter assigned to write a news report about the statistical results on September 24, 2009. Write a short news report that would be appropriate for your city’s newspaper. Remember that most readers will not be familiar with the previously calculated statistical measures, so be sure to explain what they measure when writing the article.
+
+\bigskip
+
+The result form an HIV vaccine clinical trial indicates that the vaccine worked on preventing HIV. The trial divided 16395 people into two almost equal group. 8197 people in vaccine group will get the real vaccine, and the rest 8198 people are in placebo group. People in the placebo group do not know whether the vaccine they get is real or not. According to the result, 74 people in placebo group infect HIV, this number decreased to 51 in vaccine group. Although the reduced number 23 is not large, we made some progresses. Further investigations are needed to confirm our result.   
+
+\newpage
+
+# 20.
+
+Continuing Exercise 19, the Rerks-Ngarm et al. (2009) paper was published on October 20, 2009, on the New England Journal of Medicine’s website. This paper contained two other versions of the data named the “intent-to-treat” data and the “per-protocol” data, and these data sets are shown in Tables 1.10 and 1.11. The intent-to-treat data contains seven additional individuals that were not in the modified intent-to-treat data. These additional individuals were enrolled in the clinical trial and treated, but later were found to have been HIV positive before the trial had started. The “perprotocol” data contains only those individuals that received all four treatments of ALVAC-HIV and both treatments of AIDSVAX B/E as specified in the treatment protocol for the clinical trial. Using each of these additional data sets, repeat (a) and (b).
+
+```{r}
+table1.10 <- array(data = c(56,76,132,8146,8124,16270,8202,8200,16402), 
+                 dim = c(3,3), 
+                 dimnames = list(Treatment = c("Vaccine", "Placebo", "Total"),
+                                 Response = c("HIV", "No HIV", "Total")))
+table1.10
+```
+```{r}
+table1.11 <- array(data = c(36,50,86,6140,6316,12456,6176,6366,12542), 
+                 dim = c(3,3), 
+                 dimnames = list(Treatment = c("Vaccine", "Placebo", "Total"),
+                                 Response = c("HIV", "No HIV", "Total")))
+table1.11
+```
+
+
+# (a)
+
+Table1.10 HIV vaccine results from the intent-to-treat data
+
+The sample used in the study is 16,402 healthy men and women between the ages of 18 and 30 years in Rayong and Chon Buri provinces in Thailand, but we do not know there 7 additional individuals were enrolled in the clinical trial and treated, but later were found to have been HIV positive before the trial had started. The population is all the healthy people between the ages of 18 and 30 years in Rayong and Chon Buri provinces in Thailand. Finally the population ultimately that the researchers would like to extend their conclusions to is the whole world.
+
+\bigskip
+
+Table1.11 HIV vaccine results from the per-protocol data
+
+The sample used in the study is 12,542 healthy men and women between the ages of 18 and 30 years in Rayong and Chon Buri provinces in Thailand, These 12,542 individuals received all four treatments of ALVAC-HIV and both treatments of AIDSVAX B/E as specified in the treatment protocol for the clinical trial. The population is all the healthy people between the ages of 18 and 30 years in Rayong and Chon Buri provinces in Thailand. Finally the population ultimately that the researchers would like to extend their conclusions to is the whole world.
+
+\newpage
+
+# (b)
+
+Table1.10 HIV vaccine results from the intent-to-treat data
+
+## Hypothesis Test
+
+```{r}
+c.table1.10 <- array(data = c(56,76,8146,8124),
+                 dim = c(2,2),
+                 dimnames = list(Treatment = c("Vaccine", "Placebo"),
+                                 Response = c("HIV", "No HIV")))
+c.table1.10
+assocstats(x = c.table1.10)
+```
+
+
+```{r}
+# Initialize
+w1 <- 56
+w2 <- 76
+n1 <- 8202
+n2 <- 8200
+pi.hat1 <- w1/n1
+pi.hat2 <- w2/n2
+alpha <- 0.05
+```
+
+## Relative Risk
+
+```{r}
+round(pi.hat1/pi.hat2, 4)
+```
+
+## Relative Risk CI
+
+```{r}
+var.log.rr<-(1-pi.hat1)/(n1*pi.hat1) + (1-pi.hat2)/(n2*pi.hat2)
+ci<-exp(log(pi.hat1/pi.hat2) + qnorm(p = c(alpha/2, 1-alpha/2)) * sqrt(var.log.rr))
+round(ci, 4)
+```
+
+## Odds Ratio
+
+```{r}
+Odds1 <- pi.hat1/(1-pi.hat1)
+Odds2 <- pi.hat2/(1-pi.hat2)
+OR.hat <- Odds1/Odds2
+round(OR.hat, 4)
+```
+
+## Odds Ratio CI
+
+```{r}
+var.log.or<-1/w1 + 1/(n1-w1) + 1/w2 + 1/(n2-w2)
+OR.CI<-exp(log(OR.hat) + qnorm(p = c(alpha/2, 1-alpha/2)) * sqrt(var.log.or))
+round(OR.CI, 4)
+```
+
+According to the data in Table1.10, we fail to reject the null hypothesis, and the upper limit of Relative Risk CI and Odds Ratio CI are includes 1 now. We do not have evidence that using the vaccine is beneficial on preventing HIV over placebo group.
+
+\bigskip
+
+Table1.11 HIV vaccine results from the per-protocol data
+
+## Hypothesis Test
+
+```{r}
+c.table1.11 <- array(data = c(36,50,6140,6316),
+                 dim = c(2,2),
+                 dimnames = list(Treatment = c("Vaccine", "Placebo"),
+                                 Response = c("HIV", "No HIV")))
+c.table1.11
+assocstats(x = c.table1.11)
+```
+
+
+```{r}
+# Initialize
+w1 <- 36
+w2 <- 50
+n1 <- 6176
+n2 <- 6366
+pi.hat1 <- w1/n1
+pi.hat2 <- w2/n2
+alpha <- 0.05
+```
+
+## Relative Risk
+
+```{r}
+round(pi.hat1/pi.hat2, 4)
+```
+
+## Relative Risk CI
+
+```{r}
+var.log.rr<-(1-pi.hat1)/(n1*pi.hat1) + (1-pi.hat2)/(n2*pi.hat2)
+ci<-exp(log(pi.hat1/pi.hat2) + qnorm(p = c(alpha/2, 1-alpha/2)) * sqrt(var.log.rr))
+round(ci, 4)
+```
+
+## Odds Ratio
+
+```{r}
+Odds1 <- pi.hat1/(1-pi.hat1)
+Odds2 <- pi.hat2/(1-pi.hat2)
+OR.hat <- Odds1/Odds2
+round(OR.hat, 4)
+```
+
+## Odds Ratio CI
+
+```{r}
+var.log.or<-1/w1 + 1/(n1-w1) + 1/w2 + 1/(n2-w2)
+OR.CI<-exp(log(OR.hat) + qnorm(p = c(alpha/2, 1-alpha/2)) * sqrt(var.log.or))
+round(OR.CI, 4)
+```
+
+According to the data in Table1.11, we fail to reject the null hypothesis, and the upper limit of Relative Risk CI and Odds Ratio CI are includes 1 now. We do not have evidence that using the vaccine is beneficial on preventing HIV over placebo group.
+
+\newpage
+
+# 21. 
+
+Continuing Exercises 19 and 20, there were a number of news reports again regarding the HIV vaccine clinical trial when the Rerks-Ngarm et al. (2009) paper was published. Maugh (2009) said the following in a Los Angeles Times article:
+
+A secondary analysis of data from the Thai AIDS vaccine trial—announced last month to much acclaim—suggests that the vaccine might provide some protection against the virus, but that the results are not statistically significant. In short, they could have come about merely by chance.
+
+Interestingly, news reports like this one were rarely publicized as much as the initial release of the modified intent-to-treat data results. Using this background, complete the following:
+
+# (a) 
+
+What might have been the reaction by the media if reports on all three data sets had been released at the same time?
+
+If reports on all three data sets had been released at the same time, i think the media would not be interested. Because we can not provided a confirmed conclusion, we obtained different results from three different data sets. The media is only interested in whether the vaccine works on preventing HIV for sure, rather than how we conduct our study and the process of how we get our results.
+
+\newpage
+
+# (b)
+
+What if $\alpha$ = 0.10 or $\alpha$  = 0.01 were used instead of $\alpha$ = 0.05 for the computations in Exercises 19 and 20? Would the conclusions from the clinical trial change? Discuss.
+
+\bigskip
+
+If we use different $\alpha$ for the computations in Exercises 19 and 20, the conclusions from the clinical trial would change. We normally use $\alpha$ = 0.05, so we will obtain a 95% confidence interval. if we use $\alpha$ = 0.1 or $\alpha$ = 0.01, we will get a 90%, 99% confidence interval respectively. Moreover, we reject our null hypothesis when p-value is less than significant level $\alpha$, if $\alpha$ is changed, we may get a different conclusion. 
+
+\newpage
+
+# (c)
+
+Why do you think the intent-to-treat and per-protocol data results were less publicized? Should it have been more or less publicized given the reaction to the modified intent-to-treat analysis? Discuss.
+
+\bigskip
+
+I think the intent-to-treat and per-protocol data results were less publicized because we had less significant evidence on our result comparing to the modified intent-to-treat analysis, and people are more interested in successful cases.
+
+The reaction to the modified intent-to-treat analysis should be the same.
+
+\newpage
+
+# (d)
+
+Suppose again that you were a reporter assigned to write a news report about the statistical results. Write a short news report that would be appropriate for your city’s newspaper that takes into account all of the available information. Remember that most readers will not be familiar with the previously calculated statistical measures, so be sure to explain what they measure when writing the article.
+
+\bigskip
+
+According to the result from intent-to-treat and per-protocol data, the number of people infect HIV in vaccine group are less than the number of people infect HIV in placebo group. If we choose our significant level as 0.1 instead of 0.05, we could also conclude that vaccine works well on preventing HIV. Furthermore, if we modify our study design. Using the result from modified intent-to-treat analysis, We have more significant evidence on vaccine's effect on HIV even thought we choose the significant level as 0.05.
+
+\newpage
+
+# 4. 
+
+The failure of an O-ring on the space shuttle Challenger’s booster rockets led to its destruction in 1986. Using data on previous space shuttle launches, Dalal et al. (1989) examine the probability of an O-ring failure as a function of temperature at launch and combustion pressure. Data from their paper is included in the challenger.csv file. Below are the variables:
+
+- Flight: Flight number
+- Temp: Temperature (F) at launch
+- Pressure: Combustion pressure (psi)
+- O.ring: Number of primary field O-ring failures
+- Number: Total number of primary field O-rings (six total, three each for the two booster rockets)
+
+The response variable is O.ring, and the explanatory variables are Temp and Pressure. Complete the following:
+
+# (a) 
+
+The authors use logistic regression to estimate the probability an O-ring will fail. In order to use this model, the authors needed to assume that each O-ring is independent for each launch. Discuss why this assumption is necessary and the potential problems with it. Note that a subsequent analysis helped to alleviate the authors’ concerns about independence.
+
+\bigskip
+
+The assumption is necessary because logistic regression assume response variables follows a binomial distribution, if the response variables follows a binomial distribution, then the trials are independent of each other.
+
+The potential problem is each trials may not be independent. For example, one O-ring's success or fail depends on other O-ring's sucess or fail.
+
+\newpage
+
+# (b) 
+
+Estimate the logistic regression model using the explanatory variables in a linear form.
+
+```{r}
+challenger <- read.csv("challenger.csv")
+model.fit <- glm(formula = O.ring/Number ~ Temp + Pressure,
+                 family = binomial(link = logit),
+                 weights = Number,
+                 data = challenger)
+model.fit
+```
+
+The estimated logistic regression model:
+
+$$ logit(\hat{\pi})=2.520195-0.098297\times Temp \;+\;0.008484 \times Pressure $$
+
+\newpage
+
+# (c) 
+
+Perform LRTs to judge the importance of the explanatory variables in the model.
+
+```{r, warning=FALSE, message=FALSE}
+library(car)
+```
+
+```{r}
+Anova(model.fit, test = "LR")
+```
+
+Temp is significant important in our model, since p-value less than 0.05; However, Pressure is not significant because its p-value is larger than 0.05.
+
+\newpage
+
+# (d) 
+
+The authors chose to remove Pressure from the model based on the LRTs. Based on your results, discuss why you think this was done. Are there any potential problems with removing this variable?
+
+\bigskip
+
+Null hypothesis: $H_0: \beta_{(Pressure)}=0$ given Temp is in our model. Because p-value is large than $\alpha=0.05$, we fail to reject the null hypothesis. We conclude that $\beta_{(Pressure)}=0$, variable Pressure is not significant in our model. 
+
+It's too early to do the model selection, we need further analysis before model selection. For example, transformation. response variable might have a relationship with $\frac{1}{Pressure}$, $\sqrt{Pressure}$, or $log(Pressure)$ ,etc.
+
+\newpage
+
+# 5.
+
+Continuing Exercise 4, consider the simplified model logit($\pi$) = $\beta_0$ + $\beta_1$Temp, where $\pi$ is the probability of an O-ring failure. Complete the following:
+
+# (a) 
+
+Estimate the model.
+
+```{r}
+model.fit <- glm(formula = O.ring/Number ~ Temp,
+                 family = binomial(link = logit),
+                 weights = Number,
+                 data = challenger)
+model.fit
+```
+
+The estimated model:
+
+$$logit(\hat{\pi})=5.0850\;-\;0.1156\times Temp$$
+
+\newpage
+
+# (b) 
+Construct two plots: 
+
+(1) $\pi$ vs. Temp and 
+
+(2) Expected number of failures vs. Temp. Use a temperature range of 31$^\circ$ to 81$^\circ$ on the x-axis even though the minimum temperature in the data set was 53$^\circ$.
+
+```{r}
+par(mfrow=c(1,2))
+beta0<-model.fit$coefficients[1]
+beta1<-model.fit$coefficients[2]
+temperature = seq(31, 81, by = 1)
+y = beta0 + beta1 *temperature
+pi = exp(y)/ (1 + exp(y))
+plot(temperature, pi, type='l', main = "pi vs temperature")
+plot(temperature,6 * pi, ylab = "expected number of failures", main = "Expected number of failures vs
+temperature")
+```
+
+\newpage
+
+# (c) 
+
+Include the 95% Wald confidence interval bands for $\pi$ on the plot. Why are the bands much wider for lower temperatures than for higher temperatures?
+
+```{r}
+# Add CI bounds to the plot
+  
+# Function for C.I.s - need in order to use with curve function
+ci.pi<-function(newdata, mod.fit.obj, alpha){
+
+   linear.pred<-predict(object = mod.fit.obj, newdata = newdata, type = "link", se = TRUE)
+   CI.lin.pred.lower<-linear.pred$fit - qnorm(p = 1-alpha/2)*linear.pred$se
+   CI.lin.pred.upper<-linear.pred$fit + qnorm(p = 1-alpha/2)*linear.pred$se
+   CI.pi.lower<-exp(CI.lin.pred.lower) / (1 + exp(CI.lin.pred.lower))
+   CI.pi.upper<-exp(CI.lin.pred.upper) / (1 + exp(CI.lin.pred.upper))
+   list(lower = CI.pi.lower, upper = CI.pi.upper)
+}
+curve(expr = exp(beta0+beta1*x)/(1+exp(beta0+beta1*x)), 
+      xlim = c(31,81),
+      ylim = c(0,1),
+      main = expression(paste(pi, " vs. Temp")),
+      xlab = "Temp",
+      ylab = expression(pi))
+curve(expr = ci.pi(newdata = data.frame(Temp = x), mod.fit.obj = model.fit, alpha = 0.05)$lower, 
+      col = "blue", 
+      lty = "dotdash", add = TRUE)
+curve(expr = ci.pi(newdata = data.frame(Temp = x), mod.fit.obj = model.fit, alpha = 0.05)$upper, 
+      col = "blue", 
+      lty = "dotdash", add = TRUE)
+legend("topright", legend = c("Logistic regression model", "95% individual C.I."), 
+       lty = c("solid", "dotdash"), col = c("black", "blue"), bty = "n")
+```
+
+Because there are fewer observations on lower temperature, the bands much wider for lower temperatures than for higher temperatures.
+
+\newpage
+
+# (d) 
+
+The temperature was 31$^\circ$ at launch for the Challenger in 1986. Estimate the probability of an O-ring failure using this temperature, and compute a corresponding confidence interval. Discuss what assumptions need to be made in order to apply the inference procedures.
+
+```{r}
+predict(object = model.fit, newdata = data.frame(Temp = 31), type = "response")
+```
+
+```{r}
+# Wald interval
+alpha<-0.05
+linear.pred<-predict(object = model.fit, newdata = data.frame(Temp = 31), type = "link", se = TRUE)
+pi.hat<-exp(linear.pred$fit)/(1+exp(linear.pred$fit))
+CI.lin.pred<-linear.pred$fit + qnorm(p = c(alpha/2, 1-alpha/2))*linear.pred$se
+CI.pi<-exp(CI.lin.pred)/(1+exp(CI.lin.pred))
+CI.pi
+```
+```{r,warning=FALSE,message=FALSE}
+library(mcprofile)
+```
+
+```{r}
+# LR interval
+K<-matrix(data = c(1, 31), nrow = 1, ncol = 2, byrow = TRUE) 
+linear.combo<-mcprofile(object = model.fit, CM = K)  # Calculate -2log(Lambda)
+ci.logit.profile<-confint(object = linear.combo, level = 0.95)  # CI for beta_0 + beta_1 * x
+exp(ci.logit.profile$confint)/(1 + exp(ci.logit.profile$confint))
+```
+
+Temperature at 31$^\circ$ is a extrapolate point, we assume that it follows the same model we find before.
+
+\newpage
+
+# (e)
+
+Rather than using Wald or profile LR intervals for the probability of failure, Dalal et al. (1989) use a parametric bootstrap to compute intervals. Their process was to 
+
+(1) simulate a large number of data sets (n = 23 for each) from the estimated model of logit($\hat{\pi}$) = $\hat{\beta_0}$ + $\hat{\beta_1}$Temp; 
+
+(2) estimate new models for each data set, say logit($\hat{\pi}^\star$) = $\hat{\beta_0}^\star$ + $\hat{\beta_1}^\star$Temp; and 
+
+(3) compute $\hat{\pi}^\star$ at a specific temperature of interest. The authors used the 0.05 and 0.95 observed quantiles from the $\hat{\pi}^\star$? simulated distribution as their 90% confidence interval limits. Using the parametric bootstrap, compute 90% confidence intervals separately at temperatures of 31$^\circ$ and 72$^\circ$
+
+```{r,message=FALSE,warning=FALSE}
+set.seed(475)
+n <- 23
+m <- 1000
+beta0_star <- NULL
+beta1_star <- NULL
+pred_31 <- NULL
+pred_72 <- NULL
+pi_star_31 <- NULL
+pi_star_72 <- NULL
+for (i in 1:m){
+index <- sample(n, replace = TRUE)
+Temp <- challenger$Temp[index]
+O.ring <- challenger$O.ring[index]
+Number <- challenger$Number[index]
+fit <- glm(formula = O.ring/Number ~ Temp,
+                 family = binomial(link = logit),
+                 weights = Number)
+beta0_star[i] <- coef(fit)[1]
+beta1_star[i] <- coef(fit)[2]
+pred_31[i] <- beta0_star[i] + beta1_star[i] * 31
+pred_72[i] <- beta0_star[i] + beta1_star[i] * 72
+pi_star_31[i] <- as.numeric(exp(pred_31[i])/(1 + exp(pred_31[i])))
+pi_star_72[i] <- as.numeric(exp(pred_72[i])/(1 + exp(pred_72[i])))
+}
+lower_31 <- sort(pi_star_31)[1000*0.05]
+upper_31 <- sort(pi_star_31)[1000*0.95]
+c(lower_31, upper_31)
+lower_72 <- sort(pi_star_72)[1000*0.05]
+upper_72 <- sort(pi_star_72)[1000*0.95]
+c(lower_72, upper_72)
+```
+
+
+\newpage
+
+# (f)
+
+Determine if a quadratic term is needed in the model for the temperature.
+
+```{r}
+Temp2 <- (challenger$Temp)^2
+model.fit2 <- glm(formula = O.ring/Number ~ Temp + Temp2,
+                 family = binomial(link = logit),
+                 weights = Number,
+                 data = challenger)
+summary(model.fit2)
+```
+
+Null hypothesis: $H_0: \beta_{(Temp2)}=0$ given Temp is in our model. We reject the null hypothesis, because p-value for Temp2 is larger than 0.05, a quadratic term is not needed in the model for the temperature.
+
+\newpage
+
+# 6. 
+
+Continuing Exercise 5, investigate if the estimated probability of failure would have significantly changed if a probit or complementary log-log regression model was used instead of a logistic regression model.
+
+```{r}
+model.fit.probit <- glm(formula = O.ring/Number ~ Temp,
+                        family = binomial(link = probit),
+                        weights = Number,
+                        data = challenger)
+model.fit.probit
+model.fit.cloglog <- glm(formula = O.ring/Number ~ Temp,
+                        family = binomial(link = cloglog),
+                        weights = Number,
+                        data = challenger)
+model.fit.cloglog
+```
+
+```{r}
+# logistic
+predict(object = model.fit, newdata = data.frame(Temp = c(31,72)), type = "response")
+# probit
+predict(object = model.fit.probit, newdata = data.frame(Temp = c(31,72)), type = "response")
+# complementary log-log
+predict(object = model.fit.cloglog, newdata = data.frame(Temp = c(31,72)), type = "response")
+```
+
+At temperature 72$^\circ$, the estimated probability of failure is similar; however, the estimated probability of failure have some changes using different models. I think the reason is 72$^\circ$ is inside the temp range in our original dataset, but 31$^\circ$ is a extrapolate point, we assume it follows the same model.
+
+
+
+
