@@ -1,8 +1,10 @@
 # STAT 475Applied-discrete-data-analysis
 
-<h4>CALENDAR DESCRIPTION:</h4>
+    <h2><a name="description">Description</a></h2>
+    <div class="ruled ruledMargin"></div>
+            <h4>CALENDAR DESCRIPTION:</h4>
         <p>Introduction to standard methodology for analyzing categorical data including chi-squared tests for two- and multi-way contingency tables, logistic regression, and loglinear (Poisson) regression. Students with credit for the former STAT 402 or 602 may not take this
-course for further credit.  </p>
+course for further credit.  Quantitative.</p>
     
             <h4>COURSE DETAILS:</h4>
         <p><strong>Course Outline:</strong><br /><br />This course introduces students to the most important methods for analyzing categorical data. The focus of the course is twofold: classical methods in categorical data analysis, such as chi-squared tests, and logistic and loglinear (Poisson) regression techniques. <br /><br />
