@@ -13,3 +13,4 @@ course for further credit.  Quantitative.</p>
 <li>Analysis with count response&nbsp;</li>
 <li>Model selection and evaluation</li>
 <li>Further topics</li>
+<ol>
