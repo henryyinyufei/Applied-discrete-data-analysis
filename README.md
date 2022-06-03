@@ -8,7 +8,7 @@ Introduction to standard methodology for analyzing categorical data including ch
 
 This course introduces students to the most important methods for analyzing categorical data. The focus of the course is twofold: classical methods in categorical data analysis, such as chi-squared tests, and logistic and loglinear (Poisson) regression techniques.
 
-\tab Introduction and review: likelihood methods and R
+&nbsp Introduction and review: likelihood methods and R
 Analysis with binary variables 
 Analysis with multicategory variables 
 Analysis with count response 
